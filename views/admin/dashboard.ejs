@@ -1,0 +1,104 @@
+<%- include('../partials/header', { title: '管理パネル', user: user }) %>
+
+<div class="admin-container">
+    <div class="admin-sidebar">
+        <h3>管理メニュー</h3>
+        <ul>
+            <li class="active"><a href="/admin">ユーザー管理</a></li>
+            <li><a href="/admin/add-user">新規ユーザー追加</a></li>
+        </ul>
+    </div>
+
+    <div class="admin-content">
+        <h1>ユーザー管理</h1>
+
+        <% if (success) { %>
+        <div class="alert alert-success">
+            <% if (success === 'user_added') { %> ユーザーが正常に追加されました
+            <% } else if (success === 'user_updated') { %>
+            ユーザー情報が更新されました <% } else if (success ===
+            'user_deleted') { %> ユーザーが削除されました <% } %>
+        </div>
+        <% } %> <% if (error) { %>
+        <div class="alert alert-danger">
+            <% if (error === 'user_not_found') { %>
+            ユーザーが見つかりませんでした <% } else if (error ===
+            'cannot_delete_self') { %> 自分自身のアカウントは削除できません <% }
+            else if (error === 'add_user_failed' || error ===
+            'update_user_failed' || error === 'delete_user_failed') { %>
+            操作中にエラーが発生しました <% } %>
+        </div>
+        <% } %>
+
+        <div class="admin-panel">
+            <div class="panel-header">
+                <h2>ユーザー一覧</h2>
+                <a href="/admin/add-user" class="btn btn-primary"
+                    >新規ユーザー追加</a
+                >
+            </div>
+
+            <% if (users && users.length > 0) { %>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ユーザー名</th>
+                        <th>メールアドレス</th>
+                        <th>権限</th>
+                        <th>作成日</th>
+                        <th>最終ログイン</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(function(u) { %>
+                    <tr>
+                        <td><%= u.username %></td>
+                        <td><%= u.email %></td>
+                        <td><%= u.isAdmin ? '管理者' : '一般ユーザー' %></td>
+                        <td>
+                            <%= new Date(u.createdAt).toLocaleString('ja-JP') %>
+                        </td>
+                        <td>
+                            <%= u.lastLogin ? new
+                            Date(u.lastLogin).toLocaleString('ja-JP') :
+                            '未ログイン' %>
+                        </td>
+                        <td class="actions">
+                            <a
+                                href="/admin/edit-user/<%= u._id %>"
+                                class="btn btn-sm btn-info"
+                                >編集</a
+                            >
+
+                            <% if (u._id.toString() !== user._id.toString()) {
+                            %>
+                            <form
+                                action="/admin/delete-user/<%= u._id %>"
+                                method="POST"
+                                class="delete-form"
+                            >
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="return confirm('本当に削除しますか？')"
+                                >
+                                    削除
+                                </button>
+                            </form>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            <% } else { %>
+            <div class="no-data">
+                <p>ユーザーが登録されていません</p>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

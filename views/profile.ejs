@@ -1,0 +1,85 @@
+<%- include('partials/header', { title: 'プロフィール', user: user }) %>
+
+<div class="container profile-container">
+    <div class="profile-header">
+        <h1>プロフィール設定</h1>
+    </div>
+
+    <% if (success) { %>
+    <div class="alert alert-success">
+        <% if (success === 'profile_updated') { %>
+        プロフィール情報が更新されました <% } %>
+    </div>
+    <% } %> <% if (error) { %>
+    <div class="alert alert-danger">
+        <% if (error === 'incorrect_password') { %>
+        現在のパスワードが正しくありません <% } else if (error ===
+        'passwords_dont_match') { %> 新しいパスワードが一致しません <% } else if
+        (error === 'update_failed') { %> 更新中にエラーが発生しました <% } %>
+    </div>
+    <% } %>
+
+    <div class="profile-content">
+        <form action="/update-profile" method="POST" class="profile-form">
+            <div class="form-group">
+                <label for="username">ユーザー名</label>
+                <input
+                    type="text"
+                    id="username"
+                    value="<%= user.username %>"
+                    disabled
+                />
+                <small>ユーザー名は変更できません</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">メールアドレス</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="<%= user.email %>"
+                    required
+                />
+            </div>
+
+            <div class="form-section">
+                <h3>パスワード変更</h3>
+                <div class="form-group">
+                    <label for="currentPassword">現在のパスワード</label>
+                    <input
+                        type="password"
+                        id="currentPassword"
+                        name="currentPassword"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">新しいパスワード</label>
+                    <input
+                        type="password"
+                        id="newPassword"
+                        name="newPassword"
+                    />
+                    <small>8文字以上で入力してください</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">新しいパスワード(確認)</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                    />
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="/" class="btn btn-secondary">キャンセル</a>
+                <button type="submit" class="btn btn-primary">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

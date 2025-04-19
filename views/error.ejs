@@ -1,0 +1,18 @@
+<%- include('partials/header', { title: 'エラー', user: typeof user !==
+'undefined' ? user : null }) %>
+
+<div class="container error-container">
+    <div class="error-content">
+        <h1><%= title || 'エラー' %></h1>
+
+        <div class="error-message">
+            <p><%= message || 'エラーが発生しました' %></p>
+        </div>
+
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">ホームに戻る</a>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
