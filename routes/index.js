@@ -8,6 +8,9 @@ router.get("/", ensureAuthenticated, (req, res) => {
     res.render("editor", {
         title: "Markwhen Editor",
         user: req.user,
+        isAdminPage: false,
+        isProfilePage: false,
+        layout: "layouts/main",
     });
 });
 
@@ -16,6 +19,8 @@ router.get("/profile", ensureAuthenticated, (req, res) => {
     res.render("profile", {
         title: "プロフィール",
         user: req.user,
+        isAdminPage: false,
+        isProfilePage: true,
         success: req.query.success,
         error: req.query.error,
     });

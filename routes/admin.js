@@ -13,6 +13,8 @@ router.get("/", ensureAuthenticated, ensureAdmin, async (req, res) => {
             title: "管理者パネル",
             users,
             user: req.user,
+            isAdminPage: true,
+            isProfilePage: false,
             success: req.query.success,
             error: req.query.error,
         });

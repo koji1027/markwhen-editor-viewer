@@ -182,7 +182,7 @@ function extractTitle(content) {
     return null;
 }
 
-// Route to generate the preview using markwhen CLI
+// APIルート（先に処理する）
 app.post("/api/preview", async (req, res) => {
     try {
         const { content, viewType = "timeline" } = req.body;
@@ -211,7 +211,7 @@ app.post("/api/preview", async (req, res) => {
     }
 });
 
-// WebSocket connection for real-time updates
+// WebSocketの設定
 io.on("connection", (socket) => {
     console.log("Client connected");
 
@@ -254,6 +254,25 @@ io.on("connection", (socket) => {
         console.log("Client disconnected");
     });
 });
+
+// 認証ルートの設定
+if (process.env.SKIP_DB !== "true") {
+    app.use("/", require("./routes/auth"));
+    app.use("/admin", require("./routes/admin"));
+    app.use("/", require("./routes/index"));
+} else {
+    // 認証なしの場合の直接ルート
+    app.get("/", (req, res) => {
+        res.render("editor", {
+            title: "Markwhen Editor",
+            user: { username: "ゲスト", isAdmin: true },
+            layout: "layouts/main",
+        });
+    });
+}
+
+// スタティックファイルの提供は最後に（一般的なパターン）
+app.use(express.static(path.join(__dirname, "public")));
 
 // ルート設定
 app.use("/", require("./routes/index"));

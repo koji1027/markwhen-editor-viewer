@@ -1,66 +1,165 @@
-# プロジェクト管理サンプル
+---
+title: WS26 全体スケジュール
+---
 
-title: マークウェンプロジェクト管理ツール
+section 全体
+  2025-05-06: 新歓ロボコン #other_event
+  2025-05-24/2 days: 五月祭 #other_event
+  2025-06-02/2 days: 中間試験 #exam
+  2025-06-08: RC25 当日 #other_event
+  2025-06-28: 中間報告会 #report
+  2025-07-28/2025-08-02: 期末試験 #exam
+  2025-08-03/2025-08-31: 夏休み #other_event
+  2025-08-17: 最終報告会 #report
+endSection
 
-section プロジェクト計画
-  2023-10-01: プロジェクト開始 #マイルストーン
-    キックオフミーティングを開催
-    - [x] プロジェクト憲章の作成
-    - [x] ステークホルダー分析
-    @本社会議室
+section 3輪Sweve
+2025-04-06/2025-04-30: 仕様設計, wiki等を読む!3swerve_prepare #prepare
+- [ ] タスク1
+- [ ] タスク2
 
-  2023-10-02 -> 2023-10-15: 要件定義 #計画
-    - [x] ビジネス要件の収集
-    - [x] ユーザーインタビュー
-    - [x] 機能要件の文書化
-    @リサーチセンター
+after !damper_prepare/2025-06-11: 設計/CADチェック !3swerve_design #design
+- [ ] 機構A設計
+- [ ] 機構B設計
+- [ ] マージ
+- [ ] 第1回CADチェック
 
-  2023-10-16 -> 2023-11-15: 設計フェーズ #設計
-    - [x] システムアーキテクチャの設計
-    - [x] データベース設計
-    - [x] UI/UX設計
-    チームメンバー: 山田、佐藤、鈴木
-    @開発センター
+2025-06-10/2025-07-09: 加工/組み立て !3swerve_assembly #assembly
+- [ ] 機構A Roland
+- [ ] 機構A パイプ
+- [ ] 機構A 組み立て
 
-section 開発期間
-  2023-11-16 -> 2024-01-15: 開発フェーズ #開発
-    - [x] フロントエンド開発
-    - [x] バックエンド開発
-    - [x] データベース実装
-    - [x] APIの開発
-    チームメンバー: 全開発チーム
-    @開発センター
+after !3swerve_assembly/2025-07-13: 電装 !3swerve_ele #ele
+- [ ] 基板配置
+- [ ] 配線
+- [ ] 一連の動作確認
 
-  2024-01-16 -> 2024-02-15: テストフェーズ #テスト
-    - [x] 単体テスト
-    - [x] 統合テスト
-    - [x] システムテスト
-    - [x] ユーザー受け入れテスト
-    テストチーム: 田中、伊藤
-    @テストラボ
+after !3swerve_ele/2025-08-16: テストラン !3swerve_testrun #testrun
+- [ ] 経路生成
+- [ ] タイム計測
 
-  2024-02-16 -> 2024-02-28: バグ修正 #開発
-    テスト中に発見された問題の修正
-    重大度の高い不具合: 5件
-    すべての重大な不具合を修正完了
-    @開発センター
+endSection
 
-section リリースと運用
-  2024-03-01: 製品リリース #マイルストーン
-    バージョン1.0の公開
-    - [x] 本番環境へのデプロイ
-    - [x] リリースノートの作成
-    - [x] サポートチームへの引き継ぎ
-    @データセンター
+section Damper吸引Swerve
+2025-04-06/2025-05-07: 仕様設計, wiki等を読む !damper_prepare #prepare
+- [ ] タスク1
+- [ ] タスク2
 
-  2024-03-02 -> 2024-03-15: 初期サポート期間 #サポート
-    - [x] ユーザーからのフィードバック収集
-    - [x] 小規模な修正のリリース
-    - [x] パフォーマンスモニタリング
-    @カスタマーサポートセンター
+after !damper_prepare/2025-06-11: 設計/CADチェック !damper_design #design
+- [ ] 機構A設計
+- [ ] 機構B設計
+- [ ] マージ
+- [ ] 第1回CADチェック
 
-  2024-03-16 -> now: 継続的改善 #開発 #サポート
-    - [ ] 新機能の計画
-    - [ ] パフォーマンス最適化
-    - [ ] セキュリティアップデート
-    @本社
+2025-06-14/2025-07-16: 加工/組み立て !damper_assembly #assembly
+- [ ] 機構A Roland
+- [ ] 機構A パイプ
+- [ ] 機構A 組み立て
+
+after !damper_assembly/2025-07-20: 電装 !damper_ele #ele
+- [ ] 基板配置
+- [ ] 配線
+- [ ] 一連の動作確認
+
+after !damper_ele/2025-08-16: テストラン !damper_testrun #testrun
+- [ ] 経路生成
+- [ ] タイム計測
+
+endSection
+
+section ぶら下がり
+2025-04-06/2025-05-14: 仕様設計, wiki等を読む !hanging_prepare #prepare
+- [ ] タスク1
+- [ ] タスク2
+
+after !hanging_prepare/2025-06-25: 設計/CADチェック !hanging_design #design
+- [ ] 機構A設計
+- [ ] 機構B設計
+- [ ] マージ
+- [ ] 第1回CADチェック
+
+2025-06-28/2025-07-23: 加工/組み立て !hanging_assembly #assembly
+- [ ] 機構A Roland
+- [ ] 機構A パイプ
+- [ ] 機構A 組み立て
+
+after !hanging_assembly/2025-07-27: 電装 !hanging_ele #ele
+- [ ] 基板配置
+- [ ] 配線
+- [ ] 一連の動作確認
+
+after !hanging_ele/2025-08-16: テストラン !hanging_testrun #testrun
+- [ ] 経路生成
+- [ ] タイム計測
+
+endSection
+
+section ローラー投擲
+2025-04-06/2025-05-07: 仕様設計, wiki等を読む !roller_prepare #prepare
+- [ ] タスク1
+- [ ] タスク2
+
+after !roller_prepare/2025-06-11: 設計/CADチェック !roller_design #design
+- [ ] 機構A設計
+- [ ] 機構B設計
+- [ ] マージ
+- [ ] 第1回CADチェック
+
+2025-06-14/2025-07-16: 加工/組み立て !roller_assembly #assembly
+- [ ] 機構A Roland
+- [ ] 機構A パイプ
+- [ ] 機構A 組み立て
+
+after !roller_assembly/2025-07-20: 電装 !hanging_ele #ele
+- [ ] 基板配置
+- [ ] 配線
+- [ ] 一連の動作確認
+
+after !roller_ele/2025-08-16: テストラン !roller_testrun #testrun
+- [ ] 経路生成
+- [ ] タイム計測
+
+endSection
+
+section 直動投擲
+2025-04-06/2025-04-30: 仕様設計, wiki等を読む !linear_prepare #prepare
+- [ ] タスク1
+- [ ] タスク2
+
+after !linear_prepare/2025-05-28: 設計/CADチェック !linear_design #design
+- [ ] 機構A設計
+- [ ] 機構B設計
+- [ ] マージ
+- [ ] 第1回CADチェック
+
+2025-06-10/2025-07-09: 加工/組み立て !linear_assembly #assembly
+- [ ] 機構A Roland
+- [ ] 機構A パイプ
+- [ ] 機構A 組み立て
+
+after !linear_assembly/2025-07-13: 電装 !linear_ele #ele
+- [ ] 基板配置
+- [ ] 配線
+- [ ] 一連の動作確認
+
+after !linear_ele/2025-08-16: テストラン !linear_testrun #testrun
+- [ ] 経路生成
+- [ ] タイム計測
+
+endSection
+
+section 機械屋WS
+
+endSection
+
+section 回路屋WS
+
+endSection
+
+section 制御屋WS
+
+endSection
+
+section マネジメント班
+
+endSection
