@@ -1,0 +1,186 @@
+/* リセットとベーススタイル */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body,
+html {
+    height: 100%;
+    width: 100%;
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo,
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    overflow: hidden;
+}
+
+/* メインレイアウト */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+
+/* メインツールバー */
+.main-toolbar {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+}
+
+/* コンテンツコンテナ */
+.content-container {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    height: calc(100vh - 50px); /* ツールバーの高さを引く */
+    overflow: hidden;
+}
+
+/* エディターとビューワーの共通スタイル */
+.editor-container,
+.viewer-container {
+    flex: 1;
+    height: 100%;
+    position: relative;
+}
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e0e0e0;
+}
+
+/* Monacoエディター */
+#monaco-editor {
+    flex: 1;
+    width: 100%;
+    height: calc(100% - 36px); /* ステータスバーの高さを引く */
+}
+
+/* ステータスバー */
+.status {
+    height: 36px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    color: #6c757d;
+    font-size: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.status-info {
+    color: #0366d6;
+}
+
+.status-success {
+    color: #28a745;
+    background-color: #f0fff4;
+}
+
+.status-error {
+    color: #d73a49;
+    background-color: #fff5f5;
+}
+
+/* プレビューフレーム */
+#preview-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: #fff;
+}
+
+/* タイトル表示 */
+#document-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-left: 0;
+    padding-left: 0;
+    text-align: left;
+}
+
+/* ボタンとフォーム要素 */
+.btn {
+    padding: 6px 12px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn:hover {
+    background-color: #3367d6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+    background-color: #2850a7;
+    transform: translateY(1px);
+}
+
+/* ローディングインジケーター */
+.loading {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #4285f4;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .content-container {
+        flex-direction: column;
+    }
+
+    .editor-container,
+    .viewer-container {
+        height: 50%;
+        width: 100%;
+    }
+
+    .editor-container {
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+}

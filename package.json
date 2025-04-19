@@ -1,0 +1,31 @@
+{
+    "name": "markwhen-editor-viewer",
+    "version": "1.0.0",
+    "description": "Monaco EditorとMarkwhen CLIを利用したMarkwhenエディタとビューア",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js",
+        "setup": "npm install && npm install -g @markwhen/mw"
+    },
+    "keywords": [
+        "markwhen",
+        "editor",
+        "monaco",
+        "timeline",
+        "gantt",
+        "calendar"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.18.2",
+        "socket.io": "^4.7.2"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.1"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}
