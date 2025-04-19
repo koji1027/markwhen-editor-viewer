@@ -10,4 +10,67 @@
             </li>
         </ul>
     </div>
+
+    <div class="admin-content">
+        <h1>新規ユーザー追加</h1>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger">
+            <% if (error === 'user_exists') { %>
+            ユーザー名またはメールアドレスは既に使用されています <% } else { %>
+            エラーが発生しました <% } %>
+        </div>
+        <% } %>
+
+        <div class="admin-panel">
+            <form action="/admin/add-user" method="POST" class="form">
+                <div class="form-group">
+                    <label for="username">ユーザー名</label>
+                    <input type="text" id="username" name="username" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="email">メールアドレス</label>
+                    <input type="email" id="email" name="email" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">パスワード</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                    />
+                    <small>8文字以上で入力してください</small>
+                </div>
+
+                <div class="form-group">
+                    <label>権限</label>
+                    <div class="radio-group">
+                        <label>
+                            <input
+                                type="radio"
+                                name="isAdmin"
+                                value="false"
+                                checked
+                            />
+                            一般ユーザー
+                        </label>
+                        <label>
+                            <input type="radio" name="isAdmin" value="true" />
+                            管理者
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/admin" class="btn btn-secondary">キャンセル</a>
+                    <button type="submit" class="btn btn-primary">登録</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<%- include('../partials/footer') %>

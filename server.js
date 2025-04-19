@@ -8,11 +8,58 @@ const { exec } = require("child_process");
 const { promisify } = require("util");
 const execAsync = promisify(exec);
 const os = require("os");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const passport = require("passport");
+const expressLayouts = require("express-ejs-layouts");
 
+// 環境変数のロード
+dotenv.config();
+
+// データベース接続
+const connectDB = require("./config/database");
+
+// アプリケーション初期化
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Passport設定
+require("./config/passport")(passport);
+
+// EJSの設定
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(expressLayouts);
+app.set("layout", "layouts/main");
+
+// ミドルウェア
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+// セッション設定
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET || "your_session_secret",
+        resave: false,
+        saveUninitialized: false,
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGODB_URI,
+        }),
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24, // 1日
+        },
+    })
+);
+
+// Passport初期化
+app.use(passport.initialize());
+app.use(passport.session());
+
+// 定数
 const PORT = process.env.PORT || 3000;
 const TEMP_DIR = path.join(os.tmpdir(), "markwhen-editor");
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -86,7 +133,7 @@ section リリースと運用
     @本社
 `;
 
-// Ensure temporary directory exists
+// 一時ディレクトリの作成
 async function ensureTempDir() {
     try {
         await fs.mkdir(TEMP_DIR, { recursive: true });
@@ -95,10 +142,6 @@ async function ensureTempDir() {
         console.error("Error creating temporary directory:", err);
     }
 }
-
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.json());
 
 // example.mwファイルを生成する関数（初回起動時のみ実行）
 async function createExampleFileIfNotExists() {
@@ -120,6 +163,23 @@ async function createExampleFileIfNotExists() {
             error
         );
     }
+}
+
+// Markwhenファイルからタイトルを抽出する関数
+function extractTitle(content) {
+    // title: で始まる行を探す
+    const titleMatch = content.match(/^title:\s*(.+)$/m);
+    if (titleMatch && titleMatch[1]) {
+        return titleMatch[1].trim();
+    }
+
+    // # で始まる最初の見出しを探す（代替）
+    const headingMatch = content.match(/^#\s+(.+)$/m);
+    if (headingMatch && headingMatch[1]) {
+        return headingMatch[1].trim();
+    }
+
+    return null;
 }
 
 // Route to generate the preview using markwhen CLI
@@ -195,31 +255,473 @@ io.on("connection", (socket) => {
     });
 });
 
-// Markwhenファイルからタイトルを抽出する関数
-function extractTitle(content) {
-    // title: で始まる行を探す
-    const titleMatch = content.match(/^title:\s*(.+)$/m);
-    if (titleMatch && titleMatch[1]) {
-        return titleMatch[1].trim();
-    }
-
-    // # で始まる最初の見出しを探す（代替）
-    const headingMatch = content.match(/^#\s+(.+)$/m);
-    if (headingMatch && headingMatch[1]) {
-        return headingMatch[1].trim();
-    }
-
-    return null;
-}
+// ルート設定
+app.use("/", require("./routes/index"));
+app.use("/", require("./routes/auth"));
+app.use("/admin", require("./routes/admin"));
 
 // Start the server
 async function startServer() {
-    await ensureTempDir();
-    await createExampleFileIfNotExists();
+    try {
+        // データベース接続
+        await connectDB();
 
-    server.listen(PORT, () => {
-        console.log(`Server running at http://localhost:${PORT}`);
-    });
+        // テンポラリディレクトリの確認
+        await ensureTempDir();
+
+        // サンプルファイルの確認
+        await createExampleFileIfNotExists();
+
+        // CSSファイルの確認と作成
+        const authCssPath = path.join(PUBLIC_DIR, "css", "auth.css");
+        const adminCssPath = path.join(PUBLIC_DIR, "css", "admin.css");
+
+        try {
+            await fs.access(authCssPath);
+            console.log("既存のauth.cssファイルを使用します");
+        } catch {
+            // auth.cssが存在しない場合は作成
+            await fs.writeFile(
+                authCssPath,
+                `
+/* 認証関連のスタイル */
+.auth-body {
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.auth-nav {
+  background-color: #4285f4;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+.auth-logo h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  padding: 2rem;
+}
+
+.auth-form-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+.auth-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.auth-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.auth-form .form-actions {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.auth-form .btn {
+  min-width: 120px;
+}
+
+.auth-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: #666;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+`
+            );
+            console.log("auth.cssを作成しました");
+        }
+
+        try {
+            await fs.access(adminCssPath);
+            console.log("既存のadmin.cssファイルを使用します");
+        } catch {
+            // admin.cssが存在しない場合は作成
+            await fs.writeFile(
+                adminCssPath,
+                `
+/* 管理画面のスタイル */
+.header-nav {
+  background-color: #4285f4;
+  color: white;
+  padding: 0 1rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.logo a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+  background-color: #3376e6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 4px;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #2859b8;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 0.5rem 0;
+}
+
+/* 管理パネルのスタイル */
+.admin-container {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+.admin-sidebar {
+  width: 250px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e0e0e0;
+  padding: 1.5rem 1rem;
+}
+
+.admin-sidebar h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.admin-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-sidebar li {
+  margin-bottom: 0.5rem;
+}
+
+.admin-sidebar a {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #333;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.admin-sidebar a:hover {
+  background-color: #eee;
+}
+
+.admin-sidebar li.active a {
+  background-color: #4285f4;
+  color: white;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 2rem;
+}
+
+.admin-content h1 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.admin-panel {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.panel-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-table th {
+  font-weight: 600;
+  color: #666;
+  background-color: #f9f9f9;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table .actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+}
+
+.btn-info:hover {
+  background-color: #138496;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.delete-form {
+  display: inline;
+}
+
+.form {
+  padding: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-group input:disabled {
+  background-color: #f9f9f9;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #666;
+}
+
+.radio-group {
+  margin-top: 0.5rem;
+}
+
+.radio-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: normal;
+}
+
+.form-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.no-data {
+  padding: 3rem;
+  text-align: center;
+  color: #666;
+}
+
+/* プロフィールページのスタイル */
+.profile-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.profile-header {
+  margin-bottom: 2rem;
+}
+
+.profile-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.profile-form .form-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.profile-form .form-section h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+/* エラーページのスタイル */
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px);
+  padding: 2rem;
+}
+
+.error-content {
+  text-align: center;
+  max-width: 600px;
+}
+
+.error-message {
+  margin: 2rem 0;
+}
+
+.error-actions {
+  margin-top: 2rem;
+}
+`
+            );
+            console.log("admin.cssを作成しました");
+        }
+
+        // サーバー起動
+        server.listen(PORT, () => {
+            console.log(`Server running at http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error("サーバー起動エラー:", error);
+        process.exit(1);
+    }
 }
 
 startServer();

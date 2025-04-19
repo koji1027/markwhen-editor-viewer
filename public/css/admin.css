@@ -1,0 +1,320 @@
+/* 管理画面のスタイル */
+.header-nav {
+    background-color: #4285f4;
+    color: white;
+    padding: 0 1rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.logo a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: #3376e6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 4px;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #2859b8;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 0.5rem 0;
+}
+
+/* 管理パネルのスタイル */
+.admin-container {
+    display: flex;
+    min-height: calc(100vh - 60px);
+}
+
+.admin-sidebar {
+    width: 250px;
+    background-color: #f8f9fa;
+    border-right: 1px solid #e0e0e0;
+    padding: 1.5rem 1rem;
+}
+
+.admin-sidebar h3 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.admin-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.admin-sidebar li {
+    margin-bottom: 0.5rem;
+}
+
+.admin-sidebar a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.admin-sidebar a:hover {
+    background-color: #eee;
+}
+
+.admin-sidebar li.active a {
+    background-color: #4285f4;
+    color: white;
+}
+
+.admin-content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.admin-content h1 {
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.admin-panel {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.panel-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-table th {
+    font-weight: 600;
+    color: #666;
+    background-color: #f9f9f9;
+}
+
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table .actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.delete-form {
+    display: inline;
+}
+
+.form {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.form-group input:disabled {
+    background-color: #f9f9f9;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #666;
+}
+
+.radio-group {
+    margin-top: 0.5rem;
+}
+
+.radio-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: normal;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.no-data {
+    padding: 3rem;
+    text-align: center;
+    color: #666;
+}
+
+/* プロフィールページのスタイル */
+.profile-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.profile-header {
+    margin-bottom: 2rem;
+}
+
+.profile-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+.profile-form .form-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.profile-form .form-section h3 {
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+/* エラーページのスタイル */
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 60px);
+    padding: 2rem;
+}
+
+.error-content {
+    text-align: center;
+    max-width: 600px;
+}
+
+.error-message {
+    margin: 2rem 0;
+}
+
+.error-actions {
+    margin-top: 2rem;
+}
