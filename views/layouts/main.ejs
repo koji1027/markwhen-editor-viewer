@@ -1,133 +1,143 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> | Markwhen Editor and Viewer</title>
-    
+    <title>
+        <%= title %> | Markwhen Editor and Viewer
+    </title>
+
     <!-- CSS読み込みはeditor.ejsファイル内で行う -->
-    <% if (typeof isAdminPage !== 'undefined' && isAdminPage || typeof isProfilePage !== 'undefined' && isProfilePage) { %>
+    <% if (typeof isAdminPage !=='undefined' && isAdminPage || typeof isProfilePage !=='undefined' && isProfilePage) {
+        %>
         <link rel="stylesheet" href="/css/admin.css">
-    <% } %>
-    
-    <style>
-        /* ヘッダーナビゲーションとエディタの調整用CSS */
-        .header-nav {
-            background-color: #4285f4;
-            color: white;
-            padding: 0 1rem;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            margin: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-        
-        body.with-header .container {
-            padding-top: 60px; /* ヘッダーの高さ分だけ上部にパディングを追加 */
-            height: 100vh;
-        }
-        
-        body.with-header .content-container {
-            height: calc(100vh - 50px - 60px); /* ツールバー+ヘッダーの高さを引く */
-        }
-        
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-        
-        .logo a {
-            color: white;
-            text-decoration: none;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .dropdown {
-            position: relative;
-        }
-        
-        .dropbtn {
-            background-color: #3367d6;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: white;
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            z-index: 1001;
-            border-radius: 4px;
-        }
-        
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        
-        .dropdown-content a {
-            color: #333;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-        
-        .dropdown-content a:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .dropdown-divider {
-            height: 1px;
-            background-color: #e0e0e0;
-            margin: 4px 0;
-        }
-    </style>
+        <% } %>
+
+            <style>
+                /* ヘッダーナビゲーションとエディタの調整用CSS */
+                .header-nav {
+                    background-color: #4285f4;
+                    color: white;
+                    padding: 0 1rem;
+                    height: 60px;
+                    display: flex;
+                    align-items: center;
+                    margin: 0;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    z-index: 1000;
+                }
+
+                body.with-header .container {
+                    padding-top: 60px;
+                    /* ヘッダーの高さ分だけ上部にパディングを追加 */
+                    height: 100vh;
+                }
+
+                body.with-header .content-container {
+                    height: calc(100vh - 50px - 60px);
+                    /* ツールバー+ヘッダーの高さを引く */
+                }
+
+                .nav-container {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    width: 100%;
+                }
+
+                .logo a {
+                    color: white;
+                    text-decoration: none;
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                }
+
+                .user-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                }
+
+                .dropdown {
+                    position: relative;
+                }
+
+                .dropbtn {
+                    background-color: #3367d6;
+                    color: white;
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                }
+
+                .dropdown-content {
+                    display: none;
+                    position: absolute;
+                    right: 0;
+                    background-color: white;
+                    min-width: 160px;
+                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+                    z-index: 1001;
+                    border-radius: 4px;
+                }
+
+                .dropdown:hover .dropdown-content {
+                    display: block;
+                }
+
+                .dropdown-content a {
+                    color: #333;
+                    padding: 12px 16px;
+                    text-decoration: none;
+                    display: block;
+                }
+
+                .dropdown-content a:hover {
+                    background-color: #f5f5f5;
+                }
+
+                .dropdown-divider {
+                    height: 1px;
+                    background-color: #e0e0e0;
+                    margin: 4px 0;
+                }
+            </style>
 </head>
-<body<% if (typeof user !== 'undefined') { %> class="with-header"<% } %>>
-    <% if (typeof user !== 'undefined') { %>
-    <div class="header-nav">
-        <div class="nav-container">
-            <div class="logo">
-                <a href="/">Markwhen Editor</a>
-            </div>
-            <div class="user-info">
-                <span><%= user.username %></span>
-                <div class="dropdown">
-                    <button class="dropbtn">メニュー ▼</button>
-                    <div class="dropdown-content">
-                        <a href="/">エディター</a>
-                        <a href="/profile">プロフィール</a>
-                        <% if (user.isAdmin) { %>
-                            <a href="/admin">管理パネル</a>
-                        <% } %>
-                        <div class="dropdown-divider"></div>
-                        <a href="/logout">ログアウト</a>
+<body<% if (typeof user !=='undefined' ) { %> class="with-header"<% } %>>
+        <% if (typeof user !=='undefined' ) { %>
+            <div class="header-nav">
+                <div class="nav-container">
+                    <div class="logo">
+                        <a href="/">Markwhen Editor</a>
+                    </div>
+                    <div class="user-info">
+                        <span>
+                            <%= user.username %>
+                        </span>
+                        <div class="dropdown">
+                            <button class="dropbtn">メニュー ▼</button>
+                            <div class="dropdown-content">
+                                <a href="/">エディター</a>
+                                <a href="/documents">マイドキュメント</a>
+                                <a href="/profile">プロフィール</a>
+                                <% if (user.isAdmin) { %>
+                                    <a href="/admin">管理パネル</a>
+                                    <% } %>
+                                        <div class="dropdown-divider"></div>
+                                        <a href="/logout">ログアウト</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <% } %>
-    <%- body %>
-</body>
+            <% } %>
+                <%- body %>
+                    </body>
+
 </html>

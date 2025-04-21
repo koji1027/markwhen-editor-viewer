@@ -274,7 +274,10 @@ if (process.env.SKIP_DB !== "true") {
 // スタティックファイルの提供は最後に（一般的なパターン）
 app.use(express.static(path.join(__dirname, "public")));
 
-// ルート設定
+// API routes for document operations
+app.use("/api/documents", require("./routes/documents"));
+
+// 既存のルート設定は維持
 app.use("/", require("./routes/index"));
 app.use("/", require("./routes/auth"));
 app.use("/admin", require("./routes/admin"));

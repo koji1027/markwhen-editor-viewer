@@ -1,0 +1,125 @@
+<%- include('partials/header', { title: 'マイドキュメント', user: user }) %>
+
+<div class="container profile-container">
+    <div class="profile-header">
+        <h1>マイドキュメント</h1>
+    </div>
+
+    <% if (success) { %>
+    <div class="alert alert-success">
+        <% if (success === 'document_deleted') { %> ドキュメントが削除されました
+        <% } %>
+    </div>
+    <% } %> <% if (error) { %>
+    <div class="alert alert-danger">
+        <% if (error === 'delete_failed') { %>
+        ドキュメントの削除中にエラーが発生しました <% } %>
+    </div>
+    <% } %>
+
+    <div class="profile-content">
+        <div class="documents-header">
+            <h2>保存されたドキュメント</h2>
+            <a href="/" class="btn btn-primary">新規作成</a>
+        </div>
+
+        <% if (documents && documents.length > 0) { %>
+        <table class="documents-table">
+            <thead>
+                <tr>
+                    <th>タイトル</th>
+                    <th>最終更新日</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% documents.forEach(function(doc) { %>
+                <tr>
+                    <td><%= doc.title %></td>
+                    <td>
+                        <%= new Date(doc.updatedAt).toLocaleString('ja-JP') %>
+                    </td>
+                    <td class="actions">
+                        <a
+                            href="/?id=<%= doc._id %>"
+                            class="btn btn-sm btn-info"
+                            >開く</a
+                        >
+                        <form
+                            action="/documents/delete/<%= doc._id %>"
+                            method="POST"
+                            class="delete-form"
+                        >
+                            <button
+                                type="submit"
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('本当に削除しますか？')"
+                            >
+                                削除
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <% } else { %>
+        <div class="no-data">
+            <p>保存されたドキュメントがありません</p>
+            <p><a href="/" class="btn btn-primary">新規作成</a></p>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<style>
+    .documents-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .documents-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .documents-table th,
+    .documents-table td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .documents-table th {
+        font-weight: 600;
+        color: #666;
+        background-color: #f9f9f9;
+    }
+
+    .documents-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .documents-table .actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .delete-form {
+        display: inline;
+    }
+
+    .no-data {
+        padding: 2rem;
+        text-align: center;
+        color: #666;
+    }
+
+    .no-data p {
+        margin-bottom: 1rem;
+    }
+</style>
+
+<%- include('partials/footer') %>

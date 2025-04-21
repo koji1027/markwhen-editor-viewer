@@ -9,6 +9,7 @@ let socket;
 let currentContent = "";
 let debounceTimer;
 const debounceDelay = 300; // プレビュー更新の遅延時間を300ミリ秒に設定（リアルタイム更新のため）
+let currentDocumentId = null;
 
 // アプリケーション初期化
 async function initApplication() {
@@ -21,8 +22,18 @@ async function initApplication() {
     // イベントリスナーの設定
     setupEventListeners();
 
-    // デフォルトコンテンツの読み込み
-    loadDefaultContent();
+    // ユーザードキュメントの読み込み
+    loadUserDocuments();
+
+    // URLからドキュメントIDが指定されているか確認して読み込む
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get("id");
+    if (docId) {
+        loadDocument(docId);
+    } else {
+        // デフォルトコンテンツの読み込み
+        loadDefaultContent();
+    }
 }
 
 // WebSocket接続の設定
@@ -302,23 +313,33 @@ function createEditor() {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             updatePreview();
-        }, 300); // 遅延時間を300msに短縮して、よりリアルタイムな感覚にする
+        }, debounceDelay);
     });
 
     // カーソル位置変更イベントのリスナー
     editor.onDidChangeCursorPosition((e) => {
         const position = e.position;
-        const model = editor.getModel();
         updateStatus(`行: ${position.lineNumber}, 列: ${position.column}`);
     });
 }
 
 // イベントリスナーのセットアップ
 function setupEventListeners() {
-    // 保存ボタンを非表示にするか、ラベルを変更
+    // 保存ボタン
     const saveButton = document.getElementById("save-btn");
     if (saveButton) {
-        saveButton.style.display = "none"; // 保存ボタンを非表示に
+        saveButton.addEventListener("click", saveDocument);
+    }
+
+    // ドキュメント選択
+    const documentSelect = document.getElementById("document-select");
+    if (documentSelect) {
+        documentSelect.addEventListener("change", () => {
+            const selectedId = documentSelect.value;
+            if (selectedId) {
+                loadDocument(selectedId);
+            }
+        });
     }
 
     // サンプル読み込みボタン - example.mwファイルを読み込む
@@ -337,6 +358,135 @@ function setupEventListeners() {
             editor.layout();
         }
     });
+}
+
+// ユーザーのドキュメント一覧を読み込む
+async function loadUserDocuments() {
+    try {
+        const response = await fetch("/api/documents");
+
+        if (!response.ok) {
+            throw new Error(
+                `ドキュメント一覧の取得に失敗しました: ${response.status} ${response.statusText}`
+            );
+        }
+
+        const documents = await response.json();
+
+        // ドキュメント選択リストを更新
+        const documentSelect = document.getElementById("document-select");
+
+        // 最初のオプションを維持
+        documentSelect.innerHTML =
+            '<option value="">-- 保存済みファイル --</option>';
+
+        // ドキュメントオプションを追加
+        documents.forEach((doc) => {
+            const option = document.createElement("option");
+            option.value = doc._id;
+            option.textContent = doc.title;
+            documentSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("ドキュメント読み込みエラー:", error);
+        updateStatus(`エラー: ${error.message}`, "error");
+    }
+}
+
+// ドキュメントを読み込む
+async function loadDocument(documentId) {
+    try {
+        updateStatus("ドキュメント読み込み中...");
+
+        const response = await fetch(`/api/documents/${documentId}`);
+
+        if (!response.ok) {
+            throw new Error(
+                `ドキュメントの取得に失敗しました: ${response.status} ${response.statusText}`
+            );
+        }
+
+        const document = await response.json();
+
+        // エディタにコンテンツをセット
+        editor.setValue(document.content);
+        document.getElementById("document-title").value = document.title;
+        document.getElementById("document-id").value = document._id;
+        currentDocumentId = document._id;
+
+        // ドキュメント選択リストの選択を更新
+        const documentSelect = document.getElementById("document-select");
+        documentSelect.value = document._id;
+
+        // プレビューの更新
+        updatePreview();
+
+        updateStatus("ドキュメントを読み込みました", "success");
+    } catch (error) {
+        console.error("ドキュメント読み込みエラー:", error);
+        updateStatus(`エラー: ${error.message}`, "error");
+    }
+}
+
+// ドキュメントを保存する
+async function saveDocument() {
+    try {
+        const title = document.getElementById("document-title").value.trim();
+        const content = editor.getValue();
+        const documentId = document.getElementById("document-id").value;
+
+        if (!title) {
+            updateStatus("エラー: タイトルを入力してください", "error");
+            return;
+        }
+
+        updateStatus("ドキュメント保存中...");
+
+        let url = "/api/documents";
+        let method = "POST";
+
+        // 既存のドキュメントなら更新
+        if (documentId) {
+            url = `/api/documents/${documentId}`;
+            method = "PUT";
+        }
+
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ title, content }),
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                `ドキュメントの保存に失敗しました: ${response.status} ${response.statusText}`
+            );
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+            // ドキュメントIDを更新
+            document.getElementById("document-id").value = result.document._id;
+            currentDocumentId = result.document._id;
+
+            // ユーザードキュメント一覧を再度読み込み
+            await loadUserDocuments();
+
+            // ドキュメント選択リストの選択を更新
+            const documentSelect = document.getElementById("document-select");
+            documentSelect.value = result.document._id;
+
+            updateStatus("ドキュメントを保存しました", "success");
+        } else {
+            throw new Error(result.error || "ドキュメントの保存に失敗しました");
+        }
+    } catch (error) {
+        console.error("ドキュメント保存エラー:", error);
+        updateStatus(`エラー: ${error.message}`, "error");
+    }
 }
 
 // デフォルトコンテンツの読み込み
@@ -371,12 +521,13 @@ function loadDefaultContent() {
 
     // エディタにコンテンツをセット
     editor.setValue(defaultContent);
+    document.getElementById("document-title").value = "新規ドキュメント";
+    document.getElementById("document-id").value = "";
+    currentDocumentId = null;
 
     // 初期プレビューの更新
     updatePreview();
 }
-
-// このメソッドは不要になりました - loadExampleFileに置き換えられました
 
 // プレビューの更新
 function updatePreview() {
@@ -458,6 +609,10 @@ async function loadExampleFile() {
 
         // エディタにコンテンツをセット
         editor.setValue(content);
+        document.getElementById("document-title").value =
+            "サンプルドキュメント";
+        document.getElementById("document-id").value = "";
+        currentDocumentId = null;
 
         // プレビューの更新
         updatePreview();
